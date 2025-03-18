@@ -97,11 +97,6 @@ export default function Home() {
               desc: "Save your masterpiece with a single click in high quality",
               icon: "💾" 
             },
-            { 
-              title: "Collage Mode", 
-              desc: "Create beautiful layouts with multiple photos effortlessly",
-              icon: "✨" 
-            },
           ].map((feature, i) => (
             <div key={i} className="p-6 rounded-2xl border border-[#E0E0E0] hover:border-[#6C5DD3]/30 transition-all backdrop-blur-sm bg-white/5 group hover:shadow-lg">
               <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#6C5DD3]/10 to-[#FF6B81]/10 flex items-center justify-center text-2xl mb-4 group-hover:from-[#6C5DD3]/20 group-hover:to-[#FF6B81]/20 transition-all">
