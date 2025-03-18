@@ -1,102 +1,144 @@
+import { ModeToggle } from "@/components/themeSwitch";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Home() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.js
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Background Elements */}
+      <div className="absolute top-0 left-0 w-full h-full -z-10">
+        <div className="absolute top-[-300px] right-[-300px] w-[600px] h-[600px] rounded-full bg-gradient-to-r from-[#6C5DD3] to-[#FF6B81] opacity-20 blur-[100px]"></div>
+        <div className="absolute bottom-[-200px] left-[-200px] w-[500px] h-[500px] rounded-full bg-gradient-to-r from-[#00C2CB] to-[#FCE22A] opacity-10 blur-[100px]"></div>
+      </div>
+      
+      {/* Navbar */}
+      <nav className="container mx-auto py-6 px-4 flex justify-between items-center">
+        <div className="flex items-center gap-2">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#FF6B81] to-[#6C5DD3] flex items-center justify-center">
+            <span className="text-white text-xl font-bold">S</span>
+          </div>
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-[#FF6B81] to-[#6C5DD3] inline-block text-transparent bg-clip-text">SnapNest</h1>
+        </div>
+        <div className="flex items-center gap-6">
+          <Link href="/features" className="text-sm font-medium hover:text-[#FF6B81] transition-colors">Features</Link>
+          <Link href="/examples" className="text-sm font-medium hover:text-[#FF6B81] transition-colors">Examples</Link>
+          <ModeToggle />
+          <Link href="/app" className="px-5 py-2 rounded-full bg-gradient-to-r from-[#6C5DD3] to-[#FF6B81] text-white text-sm font-medium hover:shadow-lg hover:shadow-[#FF6B81]/20 transition-all">
+            Try Now
+          </Link>
+        </div>
+      </nav>
+      
+      {/* Hero Section */}
+      <main className="container mx-auto px-4 pt-16 pb-32">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+          <div>
+            <h2 className="text-5xl font-bold leading-tight">
+              Transform your photos with <span className="bg-gradient-to-r from-[#FF6B81] to-[#6C5DD3] inline-block text-transparent bg-clip-text">stunning filters</span> and <span className="bg-gradient-to-r from-[#00C2CB] to-[#FCE22A] inline-block text-transparent bg-clip-text">frames</span>
+            </h2>
+            <p className="mt-6 text-lg opacity-80 leading-relaxed">
+              Upload, customize, and share – SnapNest makes photo editing simple and beautiful with instant filters, trendy frames, and one-click downloads.
+            </p>
+            <div className="mt-10 flex flex-wrap gap-4">
+              <Link href="/app" className="px-8 py-3 rounded-full bg-gradient-to-r from-[#6C5DD3] to-[#FF6B81] text-white font-medium hover:shadow-xl hover:shadow-[#FF6B81]/20 transition-all">
+                Get Started
+              </Link>
+              <Link href="/examples" className="px-8 py-3 rounded-full border border-[#E0E0E0] font-medium backdrop-blur-sm bg-white/5 hover:bg-white/10 transition-all">
+                View Examples
+              </Link>
+            </div>
+          </div>
+          <div className="relative">
+            {/* App Preview Image Placeholder */}
+            <div className="aspect-[4/3] rounded-3xl overflow-hidden border border-[#E0E0E0] shadow-2xl shadow-[#6C5DD3]/10 backdrop-blur-sm bg-white/5">
+              {/* You'll want to replace this with an actual image */}
+              <div className="w-full h-full bg-gradient-to-br from-[#F8F8F8] to-[#E0E0E0] dark:from-[#1C1C28] dark:to-[#13131f] flex items-center justify-center">
+                <p className="text-[#6C5DD3] font-medium">App Preview Image</p>
+              </div>
+            </div>
+            {/* Decorative Elements */}
+            <div className="absolute -bottom-6 -right-6 w-32 h-32 rounded-2xl border border-[#E0E0E0] shadow-lg rotate-12 bg-gradient-to-tr from-[#FF6B81]/20 to-[#FF6B81]/5 backdrop-blur-md"></div>
+            <div className="absolute -top-8 -left-8 w-24 h-24 rounded-full border border-[#E0E0E0] shadow-lg bg-gradient-to-bl from-[#00C2CB]/20 to-[#00C2CB]/5 backdrop-blur-md"></div>
+          </div>
         </div>
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
+      
+      {/* Features Section */}
+      <section className="container mx-auto px-4 py-20">
+        <h3 className="text-3xl font-bold text-center mb-16">
+          <span className="bg-gradient-to-r from-[#00C2CB] to-[#FCE22A] inline-block text-transparent bg-clip-text">Features</span> you'll love
+        </h3>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {[
+            { 
+              title: "Easy Upload", 
+              desc: "Drag & drop or use file picker to start editing instantly",
+              icon: "📤"
+            },
+            { 
+              title: "Trendy Filters", 
+              desc: "Apply vintage, cinematic, neon, pastel and more with one click",
+              icon: "🎨" 
+            },
+            { 
+              title: "Stylish Frames", 
+              desc: "Choose from polaroid, scrapbook, gradient borders and more",
+              icon: "🖼️" 
+            },
+            { 
+              title: "Live Preview", 
+              desc: "See all your changes instantly as you customize your image",
+              icon: "👀" 
+            },
+            { 
+              title: "Quick Download", 
+              desc: "Save your masterpiece with a single click in high quality",
+              icon: "💾" 
+            },
+            { 
+              title: "Collage Mode", 
+              desc: "Create beautiful layouts with multiple photos effortlessly",
+              icon: "✨" 
+            },
+          ].map((feature, i) => (
+            <div key={i} className="p-6 rounded-2xl border border-[#E0E0E0] hover:border-[#6C5DD3]/30 transition-all backdrop-blur-sm bg-white/5 group hover:shadow-lg">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#6C5DD3]/10 to-[#FF6B81]/10 flex items-center justify-center text-2xl mb-4 group-hover:from-[#6C5DD3]/20 group-hover:to-[#FF6B81]/20 transition-all">
+                {feature.icon}
+              </div>
+              <h4 className="text-xl font-semibold mb-2">{feature.title}</h4>
+              <p className="opacity-70">{feature.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+      
+      {/* Call to Action */}
+      <section className="container mx-auto px-4 py-20">
+        <div className="rounded-3xl p-12 bg-gradient-to-r from-[#6C5DD3]/10 to-[#FF6B81]/10 backdrop-blur-md border border-[#E0E0E0] relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-[#6C5DD3]/5 to-[#FF6B81]/5 opacity-50"></div>
+          <div className="relative z-10 text-center max-w-3xl mx-auto">
+            <h3 className="text-4xl font-bold mb-6">Ready to transform your photos?</h3>
+            <p className="text-lg opacity-80 mb-10">
+              Join thousands of creators who use SnapNest to add that perfect touch to their images. It's free and easy to use!
+            </p>
+            <Link href="/app" className="px-10 py-4 rounded-full bg-gradient-to-r from-[#6C5DD3] to-[#FF6B81] text-white font-medium text-lg hover:shadow-xl hover:shadow-[#FF6B81]/20 transition-all inline-block">
+              Start Editing Now
+            </Link>
+          </div>
+        </div>
+      </section>
+      
+      {/* Footer */}
+      <footer className="container mx-auto px-4 py-8 border-t border-[#E0E0E0]">
+        <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="text-sm opacity-70">© 2025 SnapNest. All rights reserved.</p>
+          <div className="flex gap-6">
+            <Link href="/terms" className="text-sm opacity-70 hover:opacity-100 transition-opacity">Terms</Link>
+            <Link href="/privacy" className="text-sm opacity-70 hover:opacity-100 transition-opacity">Privacy</Link>
+            <Link href="/contact" className="text-sm opacity-70 hover:opacity-100 transition-opacity">Contact</Link>
+          </div>
+        </div>
       </footer>
     </div>
   );
