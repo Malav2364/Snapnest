@@ -1,7 +1,6 @@
 "use client";
 import React, { useState, useRef, useEffect } from 'react';
 import { ModeToggle } from "@/components/themeSwitch";
-import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -101,111 +100,131 @@ export default function AppPage() {
   
   // Handle image download with all applied effects
   const handleDownload = () => {
-    // Create a canvas to draw the edited image
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
+    // Check if we have a reference to the preview image
+    if (!imageRef.current) {
+      alert("Please wait for the image to load completely before downloading.");
+      return;
+    }
     
-    // Load the image
-    const img = new Image();
-    img.crossOrigin = "Anonymous";  // To handle CORS issues with some images
-    
-    img.onload = () => {
-      // Calculate dimensions considering the frame
-      const frameStyle = getFrameStyle();
-      const framePadding = frameStyle.padding ? 
-        typeof frameStyle.padding === 'string' ? 
-          parseInt(frameStyle.padding.split('px')[0]) : frameStyle.padding 
-        : 0;
+    try {
+      // Create a canvas to draw the edited image
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
       
-      // Add padding for the frame
-      const totalPadding = framePadding * 2; // Padding on all sides
+      // Get the current displayed image
+      const displayedImg = imageRef.current;
       
-      // Set canvas dimensions including frame
-      canvas.width = img.width + totalPadding;
-      canvas.height = img.height + totalPadding;
+      // Get frame element and its dimensions
+      const frameElement = frameRef.current;
+      const frameStyles = window.getComputedStyle(frameElement);
       
-      // Apply frame background if any
-      if (frameStyle.backgroundColor) {
-        ctx.fillStyle = frameStyle.backgroundColor;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-      }
+      // Calculate dimensions
+      const imgWidth = displayedImg.naturalWidth;
+      const imgHeight = displayedImg.naturalHeight;
       
-      if (frameStyle.background) {
-        // For gradient background
-        const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-        gradient.addColorStop(0, "#FF6B81");
-        gradient.addColorStop(1, "#6C5DD3");
-        ctx.fillStyle = gradient;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-      }
+      // Set canvas size
+      canvas.width = imgWidth;
+      canvas.height = imgHeight;
       
-      // Apply frame opacity
-      if (frameStyle.opacity) {
-        ctx.globalAlpha = frameStyle.opacity;
-      }
-      
-      // Draw the image with frame padding
-      ctx.drawImage(img, framePadding, framePadding, img.width, img.height);
-      
-      // Reset global alpha
-      ctx.globalAlpha = 1.0;
-      
-      // Apply filter effects
+      // Get filter class to apply
       const filterClass = getFilterClass();
-      if (filterClass) {
-        try {
-          // Initialize filter string
-          let filterString = "";
-          
-          // Apply CSS filters manually to canvas
-          if (filterClass.includes('sepia')) filterString += " sepia(100%)";
-          if (filterClass.includes('brightness-90')) filterString += " brightness(90%)";
-          if (filterClass.includes('brightness-110')) filterString += " brightness(110%)";
-          if (filterClass.includes('contrast-110')) filterString += " contrast(110%)";
-          if (filterClass.includes('contrast-125')) filterString += " contrast(125%)";
-          if (filterClass.includes('saturate-75')) filterString += " saturate(75%)";
-          if (filterClass.includes('saturate-150')) filterString += " saturate(150%)";
-          if (filterClass.includes('grayscale')) filterString += " grayscale(100%)";
-          
-          // Apply the combined filter
-          if (filterString) {
-            ctx.filter = filterString.trim();
-            
-            // Draw the image again with filters
-            ctx.drawImage(img, framePadding, framePadding, img.width, img.height);
-            
-            // Reset filter
-            ctx.filter = "none";
-          }
-        } catch (error) {
-          console.error("Error applying filters:", error);
-          // Continue without filters if there's an error
-        }
-      }
       
-      try {
-        // Convert canvas to data URL
-        const dataUrl = canvas.toDataURL('image/png');
+      // Create a new image to draw from the original source
+      const img = new Image();
+      img.crossOrigin = "Anonymous";
+      
+      img.onload = () => {
+        // Apply frame background if needed
+        const frameStyle = getFrameStyle();
+        if (frameStyle.backgroundColor) {
+          ctx.fillStyle = frameStyle.backgroundColor;
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
         
-        // Create download link
-        const link = document.createElement('a');
-        link.href = dataUrl;
-        link.download = 'snapnest-edited-image.png';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      } catch (error) {
-        console.error("Error creating download:", error);
-        alert("There was an error creating your download. Please try again with a different image.");
-      }
-    };
-    
-    img.onerror = () => {
-      console.error("Error loading image");
-      alert("There was an error processing your image. It might be due to CORS restrictions.");
-    };
-    
-    img.src = image;
+        if (frameStyle.background) {
+          // For gradient background
+          const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+          gradient.addColorStop(0, "#FF6B81");
+          gradient.addColorStop(1, "#6C5DD3");
+          ctx.fillStyle = gradient;
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+        
+        // Set opacity if needed
+        if (frameStyle.opacity) {
+          ctx.globalAlpha = frameStyle.opacity;
+        }
+        
+        // Draw the image
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        
+        // Reset alpha
+        ctx.globalAlpha = 1.0;
+        
+        // Apply filters if needed
+        if (filterClass) {
+          try {
+            let filterString = "";
+            
+            // Apply CSS filters manually to canvas
+            if (filterClass.includes('sepia')) filterString += " sepia(100%)";
+            if (filterClass.includes('brightness-90')) filterString += " brightness(90%)";
+            if (filterClass.includes('brightness-110')) filterString += " brightness(110%)";
+            if (filterClass.includes('contrast-110')) filterString += " contrast(110%)";
+            if (filterClass.includes('contrast-125')) filterString += " contrast(125%)";
+            if (filterClass.includes('saturate-75')) filterString += " saturate(75%)";
+            if (filterClass.includes('saturate-150')) filterString += " saturate(150%)";
+            if (filterClass.includes('grayscale')) filterString += " grayscale(100%)";
+            
+            if (filterString.trim()) {
+              // Create a second canvas for the filtered version
+              const filterCanvas = document.createElement('canvas');
+              filterCanvas.width = canvas.width;
+              filterCanvas.height = canvas.height;
+              const filterCtx = filterCanvas.getContext('2d');
+              
+              // Apply the filter
+              filterCtx.filter = filterString.trim();
+              
+              // Draw the original canvas onto the filtered canvas
+              filterCtx.drawImage(canvas, 0, 0);
+              
+              // Replace the original canvas with the filtered one
+              canvas.width = filterCanvas.width;
+              canvas.height = filterCanvas.height;
+              ctx.drawImage(filterCanvas, 0, 0);
+            }
+          } catch (error) {
+            console.error("Error applying filters:", error);
+          }
+        }
+        
+        // Convert to data URL and trigger download
+        try {
+          const dataUrl = canvas.toDataURL('image/png');
+          const link = document.createElement('a');
+          link.href = dataUrl;
+          link.download = 'snapnest-edited-image.png';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        } catch (error) {
+          console.error("Error creating download:", error);
+          alert("There was an error creating your download. Please try again with a different image.");
+        }
+      };
+      
+      img.onerror = () => {
+        console.error("Error loading image");
+        alert("There was an error processing your image. It might be due to CORS restrictions.");
+      };
+      
+      img.src = image;
+      
+    } catch (error) {
+      console.error("Download error:", error);
+      alert("There was an error processing your download. Please try again.");
+    }
   };
   
   const getFilterClass = () => {
