@@ -62,6 +62,8 @@ export default function AppPage() {
   const [borderSize, setBorderSize] = useState(10);
   const [opacity, setOpacity] = useState(100);
   const fileInputRef = useRef(null);
+  const imageRef = useRef(null);
+  const frameRef = useRef(null);
   
   // Handle image upload
   const handleImageUpload = (e) => {
@@ -97,16 +99,113 @@ export default function AppPage() {
     }
   };
   
-  // Handle image download
+  // Handle image download with all applied effects
   const handleDownload = () => {
-    // This is just a placeholder implementation
-    // In a real app, you'd need to capture the edited canvas and convert to downloadable image
-    const link = document.createElement('a');
-    link.href = image;
-    link.download = 'snapnest-edited-image.jpg';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    // Create a canvas to draw the edited image
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    
+    // Load the image
+    const img = new Image();
+    img.crossOrigin = "Anonymous";  // To handle CORS issues with some images
+    
+    img.onload = () => {
+      // Calculate dimensions considering the frame
+      const frameStyle = getFrameStyle();
+      const framePadding = frameStyle.padding ? 
+        typeof frameStyle.padding === 'string' ? 
+          parseInt(frameStyle.padding.split('px')[0]) : frameStyle.padding 
+        : 0;
+      
+      // Add padding for the frame
+      const totalPadding = framePadding * 2; // Padding on all sides
+      
+      // Set canvas dimensions including frame
+      canvas.width = img.width + totalPadding;
+      canvas.height = img.height + totalPadding;
+      
+      // Apply frame background if any
+      if (frameStyle.backgroundColor) {
+        ctx.fillStyle = frameStyle.backgroundColor;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      }
+      
+      if (frameStyle.background) {
+        // For gradient background
+        const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+        gradient.addColorStop(0, "#FF6B81");
+        gradient.addColorStop(1, "#6C5DD3");
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      }
+      
+      // Apply frame opacity
+      if (frameStyle.opacity) {
+        ctx.globalAlpha = frameStyle.opacity;
+      }
+      
+      // Draw the image with frame padding
+      ctx.drawImage(img, framePadding, framePadding, img.width, img.height);
+      
+      // Reset global alpha
+      ctx.globalAlpha = 1.0;
+      
+      // Apply filter effects
+      const filterClass = getFilterClass();
+      if (filterClass) {
+        try {
+          // Initialize filter string
+          let filterString = "";
+          
+          // Apply CSS filters manually to canvas
+          if (filterClass.includes('sepia')) filterString += " sepia(100%)";
+          if (filterClass.includes('brightness-90')) filterString += " brightness(90%)";
+          if (filterClass.includes('brightness-110')) filterString += " brightness(110%)";
+          if (filterClass.includes('contrast-110')) filterString += " contrast(110%)";
+          if (filterClass.includes('contrast-125')) filterString += " contrast(125%)";
+          if (filterClass.includes('saturate-75')) filterString += " saturate(75%)";
+          if (filterClass.includes('saturate-150')) filterString += " saturate(150%)";
+          if (filterClass.includes('grayscale')) filterString += " grayscale(100%)";
+          
+          // Apply the combined filter
+          if (filterString) {
+            ctx.filter = filterString.trim();
+            
+            // Draw the image again with filters
+            ctx.drawImage(img, framePadding, framePadding, img.width, img.height);
+            
+            // Reset filter
+            ctx.filter = "none";
+          }
+        } catch (error) {
+          console.error("Error applying filters:", error);
+          // Continue without filters if there's an error
+        }
+      }
+      
+      try {
+        // Convert canvas to data URL
+        const dataUrl = canvas.toDataURL('image/png');
+        
+        // Create download link
+        const link = document.createElement('a');
+        link.href = dataUrl;
+        link.download = 'snapnest-edited-image.png';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } catch (error) {
+        console.error("Error creating download:", error);
+        alert("There was an error creating your download. Please try again with a different image.");
+      }
+    };
+    
+    img.onerror = () => {
+      console.error("Error loading image");
+      alert("There was an error processing your image. It might be due to CORS restrictions.");
+    };
+    
+    img.src = image;
   };
   
   const getFilterClass = () => {
@@ -177,62 +276,50 @@ export default function AppPage() {
           </Link>
         </div>
         <div className="flex items-center gap-4">
-          <ModeToggle />
+          <input 
+            type="file" 
+            ref={fileInputRef} 
+            className="hidden" 
+            accept="image/*"
+            onChange={handleImageUpload}
+          />
           <motion.button 
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.98 }}
-            onClick={() => setIsCollageMode(!isCollageMode)}
-            className={`px-3 py-1.5 text-xs rounded-full border transition-colors ${
-              isCollageMode 
-                ? "border-[#6C5DD3] bg-[#6C5DD3]/10 text-[#6C5DD3]" 
-                : "border-[#E0E0E0] dark:border-gray-700 hover:border-[#6C5DD3]/50"
-            }`}
-          >
-            {isCollageMode ? "Single Image Mode" : "Collage Mode"}
-          </motion.button>
-        </div>
-      </nav>
-      
-      <main className="container mx-auto px-6 py-8">
-        {/* Upload Section - Full Width */}
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="mb-12 text-center"
-        >
-          <h2 className="text-2xl font-bold mb-4">Create Your Masterpiece</h2>
-          <div 
-            className={`max-w-xl mx-auto border-2 border-dashed rounded-xl p-12 flex flex-col items-center justify-center cursor-pointer transition-all ${
-              isDragging 
-                ? "border-[#6C5DD3] bg-[#6C5DD3]/5" 
-                : "border-[#E0E0E0] dark:border-gray-700 hover:border-[#6C5DD3]/50"
-            }`}
+            onClick={() => fileInputRef.current.click()}
+            className="px-3 py-1.5 rounded-full bg-gradient-to-r from-[#6C5DD3] to-[#FF6B81] text-white text-sm font-medium shadow-md hover:shadow-lg hover:shadow-[#FF6B81]/20 transition-all flex items-center gap-1.5"
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
-            onClick={() => fileInputRef.current.click()}
           >
-            <input 
-              type="file" 
-              ref={fileInputRef} 
-              className="hidden" 
-              accept="image/*"
-              onChange={handleImageUpload}
-            />
-            <motion.div 
-              whileHover={{ scale: 1.1, rotate: 5 }}
-              transition={{ type: "spring", stiffness: 400, damping: 10 }}
-              className="w-16 h-16 rounded-full bg-gradient-to-r from-[#6C5DD3]/20 to-[#FF6B81]/20 flex items-center justify-center mb-4"
-            >
-              <svg className="w-8 h-8 text-[#6C5DD3]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-            </motion.div>
-            <p className="text-base font-medium mb-2">Drag & drop your image here</p>
-            <p className="text-sm opacity-70">or click to browse your files</p>
-          </div>
-        </motion.div>
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            <span>Upload</span>
+          </motion.button>
+          <ModeToggle />
+        </div>
+      </nav>
+      
+      <main className="container mx-auto px-6 py-10">
+        {/* Upload Indicator - Visible only when dragging */}
+        {isDragging && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm"
+          >
+            <div className="bg-white/90 dark:bg-[#13131f]/90 p-8 rounded-3xl shadow-2xl border-2 border-dashed border-[#6C5DD3] flex flex-col items-center">
+              <div className="w-16 h-16 rounded-full bg-[#6C5DD3]/10 flex items-center justify-center mb-4">
+                <svg className="w-8 h-8 text-[#6C5DD3]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                </svg>
+              </div>
+              <p className="text-lg font-bold">Drop your image here!</p>
+            </div>
+          </motion.div>
+        )}
         
         {/* Main Editing Area */}
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
@@ -445,6 +532,7 @@ export default function AppPage() {
             {/* Preview Canvas */}
             <div className="rounded-3xl backdrop-blur-sm bg-[#f0f0f0]/30 dark:bg-[#13131f]/30 border border-[#E0E0E0]/50 dark:border-gray-800/50 p-8 shadow-lg flex-grow flex items-center justify-center min-h-[500px] overflow-hidden">
               <motion.div 
+                ref={frameRef}
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ duration: 0.5 }}
@@ -452,6 +540,7 @@ export default function AppPage() {
                 style={getFrameStyle()}
               >
                 <motion.img 
+                  ref={imageRef}
                   key={image + selectedFilter}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}

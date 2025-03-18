@@ -1,3 +1,5 @@
+"use client"
+
 import { ModeToggle } from "@/components/themeSwitch";
 import Image from "next/image";
 import Link from "next/link";
@@ -20,9 +22,7 @@ export default function Home() {
           <h1 className="text-2xl font-bold bg-gradient-to-r from-[#FF6B81] to-[#6C5DD3] inline-block text-transparent bg-clip-text">SnapNest</h1>
         </div>
         <div className="flex items-center gap-6">
-          <Link href="/features" className="text-sm font-medium hover:text-[#FF6B81] transition-colors">Features</Link>
-          <Link href="/examples" className="text-sm font-medium hover:text-[#FF6B81] transition-colors">Examples</Link>
-          <ModeToggle />
+            <ModeToggle/>
           <Link href="/app" className="px-5 py-2 rounded-full bg-gradient-to-r from-[#6C5DD3] to-[#FF6B81] text-white text-sm font-medium hover:shadow-lg hover:shadow-[#FF6B81]/20 transition-all">
             Try Now
           </Link>
@@ -43,18 +43,19 @@ export default function Home() {
               <Link href="/app" className="px-8 py-3 rounded-full bg-gradient-to-r from-[#6C5DD3] to-[#FF6B81] text-white font-medium hover:shadow-xl hover:shadow-[#FF6B81]/20 transition-all">
                 Get Started
               </Link>
-              <Link href="/examples" className="px-8 py-3 rounded-full border border-[#E0E0E0] font-medium backdrop-blur-sm bg-white/5 hover:bg-white/10 transition-all">
-                View Examples
-              </Link>
             </div>
           </div>
           <div className="relative">
             {/* App Preview Image Placeholder */}
-            <div className="aspect-[4/3] rounded-3xl overflow-hidden border border-[#E0E0E0] shadow-2xl shadow-[#6C5DD3]/10 backdrop-blur-sm bg-white/5">
+            <div className="aspect-[1.7] rounded-3xl overflow-hidden border border-[#E0E0E0] shadow-2xl shadow-[#6C5DD3]/10 backdrop-blur-sm bg-white/5">
               {/* You'll want to replace this with an actual image */}
-              <div className="w-full h-full bg-gradient-to-br from-[#F8F8F8] to-[#E0E0E0] dark:from-[#1C1C28] dark:to-[#13131f] flex items-center justify-center">
-                <p className="text-[#6C5DD3] font-medium">App Preview Image</p>
-              </div>
+                <Image
+                  src="/Image.png"
+                  alt="App preview image"
+                  height={900}
+                  width={900}
+                  className="object-fill"
+                />
             </div>
             {/* Decorative Elements */}
             <div className="absolute -bottom-6 -right-6 w-32 h-32 rounded-2xl border border-[#E0E0E0] shadow-lg rotate-12 bg-gradient-to-tr from-[#FF6B81]/20 to-[#FF6B81]/5 backdrop-blur-md"></div>
